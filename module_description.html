@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Human Safety AI – Module Description</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            background: #fff;
+            color: #000;
+            padding: 40px 60px 60px;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        h1.main-title {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2.sub-title {
+            text-align: center;
+            font-size: 12pt;
+            font-weight: normal;
+            margin-bottom: 24px;
+            color: #333;
+        }
+
+        hr.divider {
+            border: none;
+            border-top: 1.5px solid #000;
+            margin: 12px 0 28px;
+        }
+
+        /* MODULE BLOCK */
+        .module {
+            margin-bottom: 36px;
+            border: 1px solid #000;
+        }
+
+        .module-header {
+            background: #000;
+            color: #fff;
+            padding: 8px 14px;
+            font-size: 12pt;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .module-body {
+            padding: 12px 14px 14px;
+        }
+
+        .module-desc {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11pt;
+            margin-top: 8px;
+        }
+
+        th {
+            background: #f0f0f0;
+            border: 1px solid #000;
+            padding: 6px 10px;
+            text-align: left;
+            font-weight: bold;
+            width: 22%;
+        }
+
+        td {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            vertical-align: top;
+            line-height: 1.5;
+        }
+
+        td.label {
+            font-weight: bold;
+            width: 22%;
+            background: #fafafa;
+        }
+
+        /* submodule list */
+        ul.sub-list {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        ul.sub-list li {
+            margin-bottom: 2px;
+        }
+
+        .note {
+            font-style: italic;
+            font-size: 10pt;
+            color: #444;
+            margin-top: 10px;
+        }
+
+        /* footer */
+        .footer {
+            text-align: center;
+            font-size: 10pt;
+            margin-top: 40px;
+            color: #555;
+            border-top: 1px solid #ccc;
+            padding-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 class="main-title">Human Safety AI</h1>
+    <h2 class="sub-title">Module Description Document</h2>
+    <hr class="divider" />
+
+    <!-- ══════════════════════════════════════════════════════════
+       MODULE 1 · AUTHENTICATION & USER MANAGEMENT
+  ══════════════════════════════════════════════════════════ -->
+    <div class="module">
+        <div class="module-header">Module 1 · Authentication &amp; User Management</div>
+        <div class="module-body">
+            <p class="module-desc">
+                Handles all user-related operations including registration, secure login, JWT token
+                issuance, and storage of user profiles. Supports multiple phone numbers per user
+                for multi-contact emergency alerting.
+            </p>
+            <table>
+                <tr>
+                    <td class="label">Sub-Modules</td>
+                    <td>
+                        <ul class="sub-list">
+                            <li><strong>auth_router.py</strong> – FastAPI router exposing /register, /login, /me
+                                endpoints</li>
+                            <li><strong>auth_service.py</strong> – Core logic: password hashing (bcrypt), JWT generation
+                                &amp; verification</li>
+                            <li><strong>auth_models.py</strong> – Pydantic request/response schemas (UserCreate, Token)
+                            </li>
+                            <li><strong>users.json</strong> – Lightweight flat-file user database</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">Input</td>
+                    <td>User credentials (email, password), phone number(s), name</td>
+                </tr>
+                <tr>
+                    <td class="label">Output</td>
+                    <td>JWT access token, authenticated user profile object</td>
+                </tr>
+                <tr>
+                    <td class="label">Technology</td>
+                    <td>FastAPI, Python-Jose (JWT), Passlib (bcrypt), JSON file storage</td>
+                </tr>
+                <tr>
+                    <td class="label">Frontend Pages</td>
+                    <td>Login.jsx, Register.jsx</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+       MODULE 2 · CAMERA SYSTEM
+  ══════════════════════════════════════════════════════════ -->
+    <div class="module">
+        <div class="module-header">Module 2 · Camera System</div>
+        <div class="module-body">
+            <p class="module-desc">
+                Manages the lifecycle of the webcam, captures video frames in real time,
+                and streams them as MJPEG to the frontend. A dedicated AI pipeline processes
+                each frame for fall detection and overlays bounding boxes and pose landmarks.
+            </p>
+            <table>
+                <tr>
+                    <td class="label">Sub-Modules</td>
+                    <td>
+                        <ul class="sub-list">
+                            <li><strong>camera_manager.py</strong> – Start/stop camera thread, thread-safe singleton
+                            </li>
+                            <li><strong>camera_ai.py</strong> – Per-frame AI inference, alert triggering, MJPEG
+                                generation</li>
+                            <li><strong>camera_ai_demo.py</strong> – Demo/simulation mode (no physical camera required)
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">Input</td>
+                    <td>Webcam device (OpenCV VideoCapture), authenticated user token</td>
+                </tr>
+                <tr>
+                    <td class="label">Output</td>
+                    <td>MJPEG stream feed (/camera/feed), detected events written to shared state</td>
+                </tr>
+                <tr>
+                    <td class="label">API Endpoints</td>
+                    <td>POST /camera/start, POST /camera/stop, GET /camera/status, GET /camera/feed, POST
+                        /camera/capture, POST /camera/send_alert</td>
+                </tr>
+                <tr>
+                    <td class="label">Technology</td>
+                    <td>OpenCV, Python threading, FastAPI StreamingResponse, MJPEG protocol</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+       MODULE 3 · AI DETECTION ENGINE
+  ══════════════════════════════════════════════════════════ -->
+    <div class="module">
+        <div class="module-header">Module 3 · AI Detection Engine</div>
+        <div class="module-body">
+            <p class="module-desc">
+                The core intelligence of the system. Analyses video frames using deep learning
+                pose estimation models to detect fall events. Two interchangeable backends are
+                supported — MediaPipe (CPU-friendly) and YOLOv8 (high accuracy). Sensor-based
+                fall detection via accelerometer/gyroscope is also supported.
+            </p>
+            <table>
+                <tr>
+                    <td class="label">Sub-Modules</td>
+                    <td>
+                        <ul class="sub-list">
+                            <li><strong>yolo_fall_detector.py</strong> – YOLOv8 pose model (yolov8n-pose.pt); skeleton
+                                angle &amp; velocity analysis</li>
+                            <li><strong>pose_fall_detector.py</strong> – MediaPipe Pose Landmarker; landmark-based
+                                heuristic scoring</li>
+                            <li><strong>fall_detector.py</strong> – Sensor-based detector (accelerometer + gyroscope
+                                threshold logic)</li>
+                            <li><strong>audio_detection.py</strong> – Breath/sound anomaly detection (stub, extensible)
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">Input</td>
+                    <td>BGR video frame (numpy array) from camera, or accel/gyro vectors from IoT sensors</td>
+                </tr>
+                <tr>
+                    <td class="label">Output</td>
+                    <td>Boolean fall_detected flag, confidence score, annotated frame with landmarks</td>
+                </tr>
+                <tr>
+                    <td class="label">API Endpoints</td>
+                    <td>POST /fall (sensor data), POST /sound</td>
+                </tr>
+                <tr>
+                    <td class="label">Technology</td>
+                    <td>Ultralytics YOLOv8, Google MediaPipe, NumPy, OpenCV</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+       MODULE 4 · ALERT & ESCALATION SYSTEM
+  ══════════════════════════════════════════════════════════ -->
+    <div class="module">
+        <div class="module-header">Module 4 · Alert &amp; Escalation System</div>
+        <div class="module-body">
+            <p class="module-desc">
+                Implements a 4-level graduated emergency response mechanism that automatically
+                escalates if no acknowledgement is received. Alerts are dispatched through
+                multiple channels (app notification → SMS → voice call → emergency services).
+            </p>
+            <table>
+                <tr>
+                    <td class="label">Sub-Modules</td>
+                    <td>
+                        <ul class="sub-list">
+                            <li><strong>alert_escalation.py</strong> – AlertEscalationManager, AlertEscalation,
+                                EscalationLevel enum</li>
+                            <li><strong>camera_ai.py</strong> – send_sms_alert(), send_email_alert(),
+                                send_manual_alert() helpers</li>
+                            <li><strong>shared_state.py</strong> – Stores active alerts, event log, and fall status</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">Escalation Levels</td>
+                    <td>
+                        Level 1 (0 s) – App Notification &nbsp;|&nbsp; Level 2 (30 s) – SMS via Twilio &nbsp;|&nbsp;
+                        Level 3 (60 s) – Voice Call via Twilio &nbsp;|&nbsp; Level 4 (120 s) – Emergency Services
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">Input</td>
+                    <td>Detected fall event or manual trigger, authenticated user's registered phone numbers and email
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">Output</td>
+                    <td>SMS messages, email notifications, voice calls; alert log entries in shared state</td>
+                </tr>
+                <tr>
+                    <td class="label">API Endpoints</td>
+                    <td>POST /alerts/escalate, POST /alerts/{id}/respond, POST /alerts/{id}/cancel, GET /alerts/active,
+                        GET /alerts/{id}/status</td>
+                </tr>
+                <tr>
+                    <td class="label">Technology</td>
+                    <td>Twilio REST API (SMS + Voice), SMTP (email), Python asyncio, FastAPI background tasks</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+       MODULE 5 · DASHBOARD & MONITORING
+  ══════════════════════════════════════════════════════════ -->
+    <div class="module">
+        <div class="module-header">Module 5 · Dashboard &amp; Real-Time Monitoring</div>
+        <div class="module-body">
+            <p class="module-desc">
+                The primary user interface displayed after login. Provides real-time visibility
+                into system status, live camera feed, fall detection events, and alert history.
+                Also exposes analytics (falls per day, alert channel breakdown).
+            </p>
+            <table>
+                <tr>
+                    <td class="label">Sub-Modules</td>
+                    <td>
+                        <ul class="sub-list">
+                            <li><strong>Dashboard.jsx</strong> – Main React page: live MJPEG feed, event log, camera
+                                controls, manual alert button</li>
+                            <li><strong>AuthContext.jsx</strong> – Global authentication context &amp; token management
+                                (React Context API)</li>
+                            <li><strong>api.js</strong> – Axios instance with base URL &amp; interceptors</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">Input</td>
+                    <td>JWT token (stored in localStorage), real-time data from backend REST API</td>
+                </tr>
+                <tr>
+                    <td class="label">Output</td>
+                    <td>Live MJPEG video, system status indicators, event log table, alert history, analytics charts
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">API Consumed</td>
+                    <td>GET /api/dashboard_stats, GET /api/analytics, GET /camera/feed, GET /camera/alerts, POST
+                        /camera/send_alert</td>
+                </tr>
+                <tr>
+                    <td class="label">Technology</td>
+                    <td>React 18 (Vite), Axios, Recharts / CSS charts, MJPEG &lt;img&gt; tag streaming</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+       MODULE 6 · FRONTEND UI & THEMING
+  ══════════════════════════════════════════════════════════ -->
+    <div class="module">
+        <div class="module-header">Module 6 · Frontend UI &amp; Theming</div>
+        <div class="module-body">
+            <p class="module-desc">
+                Provides the visual framework and immersive aesthetic of the web application.
+                Includes animated backgrounds, security-themed loaders, and a consistent dark-mode
+                design system shared across all pages.
+            </p>
+            <table>
+                <tr>
+                    <td class="label">Sub-Modules</td>
+                    <td>
+                        <ul class="sub-list">
+                            <li><strong>StreamingBackground.jsx</strong> – Animated streaming data background
+                                (canvas-based)</li>
+                            <li><strong>MatrixBackground.jsx</strong> – Matrix-rain canvas animation for login/register
+                                screens</li>
+                            <li><strong>SecurityLoader.jsx</strong> – Animated loading spinner shown during auth
+                                transitions</li>
+                            <li><strong>App.css / index.css</strong> – Global design tokens, dark theme, responsive
+                                layout</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">Input</td>
+                    <td>Page load events, component props (colors, speed, density for animations)</td>
+                </tr>
+                <tr>
+                    <td class="label">Output</td>
+                    <td>Rendered animated UI components composited behind page content</td>
+                </tr>
+                <tr>
+                    <td class="label">Technology</td>
+                    <td>React, HTML5 Canvas API, CSS3 animations, Vite build tool</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        Human Safety AI &nbsp;·&nbsp; Module Description &nbsp;·&nbsp; Generated 2026
+    </div>
+
+</body>
+
+</html>

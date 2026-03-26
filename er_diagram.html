@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ER Diagram – Human Safety AI Database</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #ffffff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 30px 20px 60px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #000000;
+      font-size: 1.6rem;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #555555;
+      font-size: 0.85rem;
+      margin-bottom: 40px;
+    }
+
+    /* ─── ER CANVAS ──────────────────────────────────── */
+    .er-canvas {
+      position: relative;
+      width: 1300px;
+      margin: 0 auto;
+    }
+
+    svg.lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: visible;
+    }
+
+    .er-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto auto auto;
+      gap: 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── TABLE CARD ──────────────────────────────────── */
+    .table-card {
+      background: #ffffff;
+      border: 2px solid #000000;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 3px 3px 0px #000000;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .table-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 5px 5px 0px #000000;
+    }
+
+    .table-header {
+      background: #000000;
+      padding: 10px 14px;
+      border-bottom: 2px solid #000000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-icon {
+      font-size: 1rem;
+    }
+
+    .table-name {
+      color: #ffffff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .table-fields {
+      padding: 6px 0;
+    }
+
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      border-bottom: 1px solid #dddddd;
+      transition: background 0.15s;
+    }
+
+    .field-row:last-child {
+      border-bottom: none;
+    }
+
+    .field-row:hover {
+      background: #f5f5f5;
+    }
+
+    .badge {
+      font-size: 0.6rem;
+      font-weight: 700;
+      border-radius: 3px;
+      padding: 1px 5px;
+      min-width: 28px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .pk {
+      background: #000000;
+      color: #ffffff;
+      border: 1px solid #000000;
+    }
+
+    .fk {
+      background: #ffffff;
+      color: #000000;
+      border: 1px solid #000000;
+    }
+
+    .reg {
+      background: transparent;
+      color: transparent;
+      border: 1px solid transparent;
+    }
+
+    .field-name {
+      color: #111111;
+    }
+
+    .field-name.pk-field {
+      color: #000000;
+      font-weight: 700;
+    }
+
+    .field-name.fk-field {
+      color: #444444;
+      font-style: italic;
+    }
+
+    /* ─── LEGEND ──────────────────────────────────────── */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin: 36px auto 10px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #111111;
+      font-size: 0.8rem;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .leg-pk {
+      background: #000000;
+    }
+
+    .leg-fk {
+      background: #ffffff;
+      border: 2px solid #000000;
+    }
+
+    .leg-rel {
+      background: #555555;
+      height: 10px;
+      width: 30px;
+      border-radius: 2px;
+    }
+
+    /* ─── RELATIONSHIP LABELS ─────────────────────────── */
+    .rel-label {
+      font-size: 0.65rem;
+      fill: #333333;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* grid placement */
+    .g-users {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .g-phone {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .g-sessions {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .g-escalations {
+      grid-column: 4;
+      grid-row: 1;
+    }
+
+    .g-events {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .g-alerts {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    .g-images {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    .g-sensors {
+      grid-column: 4;
+      grid-row: 2;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Entity Relationship Diagram</h1>
+  <p class="subtitle">Human Safety AI System — Database Schema</p>
+
+  <div class="er-canvas" id="erCanvas">
+
+    <!-- SVG lines drawn by JS after layout -->
+    <svg class="lines" id="svgLines"></svg>
+
+    <div class="er-grid">
+
+      <!-- users -->
+      <div class="table-card g-users" id="t-users">
+        <div class="table-header"><span class="table-icon">👤</span><span class="table-name">users</span></div>
+        <div class="table-fields">
+          <div class="field-row"><span class="badge pk">PK</span><span class="field-name pk-field">user_id</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">email</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">password_hash</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">full_name</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">is_active</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">last_login</span></div>
+        </div>
+      </div>
+
+      <!-- user_phone_numbers -->
+      <div class="table-card g-phone" id="t-phone">
+        <div class="table-header"><span class="table-icon">📱</span><span class="table-name">user_phone_numbers</span>
+        </div>
+        <div class="table-fields">
+          <div class="field-row"><span class="badge pk">PK</span><span class="field-name pk-field">phone_id</span></div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">user_id</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">phone_number</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">is_primary</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">added_at</span></div>
+        </div>
+      </div>
+
+      <!-- camera_sessions -->
+      <div class="table-card g-sessions" id="t-sessions">
+        <div class="table-header"><span class="table-icon">📷</span><span class="table-name">camera_sessions</span>
+        </div>
+        <div class="table-fields">
+          <div class="field-row"><span class="badge pk">PK</span><span class="field-name pk-field">session_id</span>
+          </div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">user_id</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">start_time</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">end_time</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">camera_mode</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">total_frames</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">status</span></div>
+        </div>
+      </div>
+
+      <!-- alert_escalations -->
+      <div class="table-card g-escalations" id="t-escalations">
+        <div class="table-header"><span class="table-icon">🚨</span><span class="table-name">alert_escalations</span>
+        </div>
+        <div class="table-fields">
+          <div class="field-row"><span class="badge pk">PK</span><span class="field-name pk-field">escalation_id</span>
+          </div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">user_id</span></div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">event_id</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">alert_type</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">current_level</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">status</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">start_time</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">response_time</span></div>
+        </div>
+      </div>
+
+      <!-- events -->
+      <div class="table-card g-events" id="t-events">
+        <div class="table-header"><span class="table-icon">⚡</span><span class="table-name">events</span></div>
+        <div class="table-fields">
+          <div class="field-row"><span class="badge pk">PK</span><span class="field-name pk-field">event_id</span></div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">session_id</span>
+          </div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">user_id</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">event_type</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">message</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">confidence</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">timestamp</span></div>
+        </div>
+      </div>
+
+      <!-- alerts -->
+      <div class="table-card g-alerts" id="t-alerts">
+        <div class="table-header"><span class="table-icon">🔔</span><span class="table-name">alerts</span></div>
+        <div class="table-fields">
+          <div class="field-row"><span class="badge pk">PK</span><span class="field-name pk-field">alert_id</span></div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">event_id</span></div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">user_id</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">alert_type</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">delivery_method</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">recipient_address</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">delivery_status</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">timestamp</span></div>
+        </div>
+      </div>
+
+      <!-- captured_images -->
+      <div class="table-card g-images" id="t-images">
+        <div class="table-header"><span class="table-icon">🖼️</span><span class="table-name">captured_images</span>
+        </div>
+        <div class="table-fields">
+          <div class="field-row"><span class="badge pk">PK</span><span class="field-name pk-field">image_id</span></div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">session_id</span>
+          </div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">user_id</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">image_data</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">captured_at</span></div>
+        </div>
+      </div>
+
+      <!-- sensor_readings -->
+      <div class="table-card g-sensors" id="t-sensors">
+        <div class="table-header"><span class="table-icon">📡</span><span class="table-name">sensor_readings</span>
+        </div>
+        <div class="table-fields">
+          <div class="field-row"><span class="badge pk">PK</span><span class="field-name pk-field">reading_id</span>
+          </div>
+          <div class="field-row"><span class="badge fk">FK</span><span class="field-name fk-field">user_id</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">accel_x / accel_y /
+              accel_z</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">gyro_x / gyro_y / gyro_z</span>
+          </div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">fall_detected</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">confidence</span></div>
+          <div class="field-row"><span class="badge reg"></span><span class="field-name">recorded_at</span></div>
+        </div>
+      </div>
+
+    </div><!-- /er-grid -->
+  </div><!-- /er-canvas -->
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot leg-pk"></div> Primary Key (PK)
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot leg-fk"></div> Foreign Key (FK)
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot leg-rel"></div> One-to-Many Relationship (1:M)
+    </div>
+  </div>
+
+  <script>
+    // Draw SVG relationship lines after DOM renders
+    window.addEventListener('load', () => {
+      const canvas = document.getElementById('erCanvas');
+      const svg = document.getElementById('svgLines');
+      const canvasR = canvas.getBoundingClientRect();
+
+      // Update SVG height to match canvas
+      canvas.style.height = canvas.scrollHeight + 'px';
+      svg.setAttribute('viewBox', `0 0 ${canvas.offsetWidth} ${canvas.scrollHeight}`);
+
+      const color = '#000000';
+      const color2 = 'rgba(0,0,0,0.3)';
+
+      function mid(el, side = 'right') {
+        const r = el.getBoundingClientRect();
+        const cx = canvasR.left;
+        const cy = canvasR.top;
+        if (side === 'right') return [r.right - cx, r.top + r.height / 2 - cy];
+        if (side === 'left') return [r.left - cx, r.top + r.height / 2 - cy];
+        if (side === 'bottom') return [r.left + r.width / 2 - cx, r.bottom - cy];
+        if (side === 'top') return [r.left + r.width / 2 - cx, r.top - cy];
+      }
+
+      function line(x1, y1, x2, y2, label = '') {
+        const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const dx = Math.abs(x2 - x1) * 0.4;
+        path.setAttribute('d', `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`);
+        path.setAttribute('stroke', color); path.setAttribute('stroke-width', '1.6');
+        path.setAttribute('fill', 'none'); path.setAttribute('marker-end', 'url(#arrow)');
+        svg.appendChild(path);
+        // cardinality
+        const t1 = mkText('1', x1 + 10, y1 - 6);
+        const t2 = mkText('M', x2 - 10, y2 - 6);
+        svg.appendChild(t1); svg.appendChild(t2);
+        if (label) {
+          const lt = mkText(label, mx, my - 8, '#333333');
+          svg.appendChild(lt);
+        }
+      }
+
+      function mkText(txt, x, y, fill = '#000000') {
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', x); t.setAttribute('y', y);
+        t.setAttribute('fill', fill); t.setAttribute('font-size', '10');
+        t.setAttribute('font-family', 'Inter,sans-serif');
+        t.setAttribute('font-weight', '600'); t.setAttribute('text-anchor', 'middle');
+        t.textContent = txt; return t;
+      }
+
+      // Arrow marker
+      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      defs.innerHTML = `
+      <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="${color}" />
+      </marker>`;
+      svg.appendChild(defs);
+
+      const U = document.getElementById('t-users');
+      const P = document.getElementById('t-phone');
+      const S = document.getElementById('t-sessions');
+      const ES = document.getElementById('t-escalations');
+      const EV = document.getElementById('t-events');
+      const AL = document.getElementById('t-alerts');
+      const IM = document.getElementById('t-images');
+      const SR = document.getElementById('t-sensors');
+
+      // users → user_phone_numbers
+      let [x1, y1] = mid(U, 'right'), [x2, y2] = mid(P, 'left');
+      line(x1, y1, x2, y2, 'has');
+
+      // users → camera_sessions
+      [x1, y1] = mid(U, 'right');[x2, y2] = mid(S, 'left');
+      line(x1, y1, x2, y2, 'initiates');
+
+      // users → alert_escalations
+      [x1, y1] = mid(U, 'right');[x2, y2] = mid(ES, 'left');
+      line(x1, y1, x2, y2, 'triggers');
+
+      // users → events
+      [x1, y1] = mid(U, 'bottom');[x2, y2] = mid(EV, 'top');
+      line(x1, y1, x2, y2, '');
+
+      // users → alerts
+      [x1, y1] = mid(U, 'bottom');[x2, y2] = mid(AL, 'top');
+      line(x1, y1, x2, y2, '');
+
+      // camera_sessions → events
+      [x1, y1] = mid(S, 'bottom');[x2, y2] = mid(EV, 'top');
+      line(x1, y1, x2, y2, 'generates');
+
+      // camera_sessions → captured_images
+      [x1, y1] = mid(S, 'bottom');[x2, y2] = mid(IM, 'top');
+      line(x1, y1, x2, y2, 'stores');
+
+      // events → alerts
+      [x1, y1] = mid(EV, 'right');[x2, y2] = mid(AL, 'left');
+      line(x1, y1, x2, y2, 'triggers');
+
+      // users → sensor_readings
+      [x1, y1] = mid(U, 'bottom');[x2, y2] = mid(SR, 'top');
+      line(x1, y1, x2, y2, 'records');
+    });
+  </script>
+</body>
+
+</html>
